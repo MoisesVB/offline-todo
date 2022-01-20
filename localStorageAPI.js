@@ -34,6 +34,7 @@ export function readTodos(rerun) {
 
     const pendingTodosContainer = document.querySelector('.pending-todos-container');
     const doneTodosContainer = document.querySelector('.done-todos-container');
+    const addTodoInput = document.querySelector('.insert-todo-input');
 
     if (rerun === 'yes') {
         while (pendingTodosContainer.firstChild) {
@@ -69,8 +70,25 @@ export function readTodos(rerun) {
         // create input  
         const input = createElementUtils('input');
         addClassToElement(input, 'task-input');
+        input.autocomplete = 'off';
         input.defaultValue = todoObject.todo;
         input.id = todoObject.id;
+
+        input.onfocus = function() {
+            input.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
+        }
+
+        input.onblur = function() {
+            input.parentElement.style.outline = 'none';
+        }
+
+        addTodoInput.onfocus = function() {
+            addTodoInput.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
+        }
+
+        addTodoInput.onblur = function() {
+            addTodoInput.parentElement.style.outline = 'none';
+        }
 
         if (todoObject.done === true) {
             appendElement(inputContainer, doneTodosContainer);
