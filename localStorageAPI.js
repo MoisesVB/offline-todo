@@ -1,29 +1,31 @@
+import { createElementUtils, addClassToElement, removeClassOfElement, appendElement } from "./utils.js";
+
 export function createTodo(todo) {
 
     let greaterKey = 0;
-    const objTodo = {
+    const todoObject = {
         id: undefined,
         todo: todo,
         done: false
     }
 
     // add key to value of 1 if there are not keys in local storage
-    if (window.localStorage.length === 0) {
-        objTodo.id = 0;
-        window.localStorage.setItem('0', JSON.stringify(objTodo));
+    if (localStorage.length === 0) {
+        todoObject.id = 0;
+        localStorage.setItem('0', JSON.stringify(todoObject));
         readTodos('yes');
     } else {
 
         // check for the greater id key
-        for (let i = 0; i < window.localStorage.length; i++) {
-            if (parseInt(window.localStorage.key(i)) > greaterKey) {
-                greaterKey = parseInt(window.localStorage.key(i));
+        for (let i = 0; i < localStorage.length; i++) {
+            if (parseInt(localStorage.key(i)) > greaterKey) {
+                greaterKey = parseInt(localStorage.key(i));
             }
         }
 
         // set the new key to plus 1 the previous key
-        objTodo.id = greaterKey + 1;
-        window.localStorage.setItem(`${greaterKey + 1}`, JSON.stringify(objTodo));
+        todoObject.id = greaterKey + 1;
+        localStorage.setItem(`${greaterKey + 1}`, JSON.stringify(todoObject));
         readTodos('yes');
     }
 }
@@ -49,78 +51,84 @@ export function readTodos(rerun) {
 
     arrayLocalStorage.map((key) => {
 
-        const objTodo = JSON.parse(window.localStorage.getItem(key));
+        const todoObject = JSON.parse(localStorage.getItem(key));
 
-        const newContainer = document.createElement('div'); // contains input, delete button and checkbox
-        newContainer.classList.add('input-container');
+        const inputContainer = createElementUtils('div'); // contains input, delete button and checkbox
+        addClassToElement(inputContainer, 'input-container');
 
-        const newTodo = document.createElement('input'); // create input
-        newTodo.classList.add('task-input');
-        newTodo.defaultValue = objTodo.todo;
-        newTodo.id = objTodo.id;
+        const input = createElementUtils('input'); // create input
+        addClassToElement(input, 'task-input');
+        input.defaultValue = todoObject.todo;
+        input.id = todoObject.id;
 
-        const checkboxContainer = document.createElement('div');
-        checkboxContainer.classList.add('checkbox-container');
-        const checkbox = document.createElement('img');
-        checkbox.classList.add('checkbox');
-        checkboxContainer.appendChild(checkbox);
-        newContainer.appendChild(checkboxContainer);
 
-        if (objTodo.done === true) {
+        const checkboxContainer = createElementUtils('div');
+        addClassToElement(checkboxContainer, 'checkbox-container');
+        const checkbox = createElementUtils('img');
+        addClassToElement(checkbox, 'checkbox');
+        appendElement(checkbox, checkboxContainer);
+        appendElement(checkboxContainer, inputContainer);
+
+        if (todoObject.done === true) {
             checkbox.src = './assets/check.svg';
         }
 
-        const deleteButtonContainer = document.createElement('div');
-        deleteButtonContainer.classList.add('delete-button-container');
-        const deleteButton = document.createElement('img');
-        deleteButton.src = './assets/delete_button.svg';
-        deleteButton.classList.add('delete-button');
-        deleteButtonContainer.appendChild(deleteButton);
+        const deleteButtonContainer = createElementUtils('div');
 
-        if (objTodo.done === true) {
-            doneTodosContainer.appendChild(newContainer);
-            newTodo.classList.add('done');
-            newContainer.appendChild(newTodo);
-        } else if (objTodo.done === false) {
-            pendingTodosContainer.appendChild(newContainer);
-            newContainer.appendChild(newTodo);
+        addClassToElement(deleteButtonContainer, 'delete-button-container');
+
+        const deleteButton = createElementUtils('img');
+        deleteButton.src = './assets/delete_button.svg';
+
+        addClassToElement(deleteButton, 'delete-button');
+        appendElement(deleteButton, deleteButtonContainer);
+
+        if (todoObject.done === true) {
+            appendElement(inputContainer, doneTodosContainer);
+            addClassToElement(input, 'done');
+            appendElement(input, inputContainer);
+        } else if (todoObject.done === false) {
+            appendElement(inputContainer, pendingTodosContainer);
+            appendElement(input, inputContainer);
         }
 
-        newContainer.appendChild(deleteButtonContainer);
+        appendElement(deleteButtonContainer, inputContainer);
 
-        if (localStorage.getItem('toggled') === 'true' && objTodo.done === true) {
-            newContainer.classList.add('hide');
+        const toggledItem = localStorage.getItem('toggled');
 
-        } else if (localStorage.getItem('toggled') === 'false' && objTodo.done === true) {
-            newContainer.classList.remove('hide');
+        if (toggledItem === 'true' && todoObject.done === true) {
+            addClassToElement(inputContainer, 'hide');
+
+        } else if (toggledItem === 'false' && todoObject.done === true) {
+            removeClassOfElement(inputContainer, 'hide');
         }
 
         // add event listener 
         deleteButtonContainer.addEventListener('click', () => {
-            const idString = '' + objTodo.id;
+            const idString = '' + todoObject.id;
             deleteTodo(idString);
         })
 
         // toggle checkbox 
         checkboxContainer.addEventListener('click', (e) => {
-            if (objTodo.done === false) {
-                toggleCheckbox(objTodo.id, true);
-            } else if (objTodo.done === true) {
-                toggleCheckbox(objTodo.id, false);
+            if (todoObject.done === false) {
+                toggleCheckbox(todoObject.id, true);
+            } else if (todoObject.done === true) {
+                toggleCheckbox(todoObject.id, false);
             }
         })
 
         // update todo with new value
-        newTodo.addEventListener('keydown', (e) => {
+        input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                updateTodo(objTodo.id, newTodo.value);
+                updateTodo(todoObject.id, input.value);
             }
         })
     })
 }
 
 function deleteTodo(id) {
-    window.localStorage.removeItem(id);
+    localStorage.removeItem(id);
     readTodos('yes');
 }
 
