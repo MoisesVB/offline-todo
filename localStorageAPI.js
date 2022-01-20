@@ -35,6 +35,15 @@ export function readTodos(rerun) {
     const pendingTodosContainer = document.querySelector('.pending-todos-container');
     const doneTodosContainer = document.querySelector('.done-todos-container');
     const addTodoInput = document.querySelector('.insert-todo-input');
+    const toggleButton = document.querySelector('.toggle-todos');
+    const toggledItem = localStorage.getItem('toggled');
+
+    // move the toggle img based on status of 'toggled' on local storage (first render)
+    if (toggledItem === 'true') {
+        toggleButton.style.transform = 'rotate(180deg)';
+    } else {
+        toggleButton.style.transform = 'rotate(0deg)';
+    }
 
     if (rerun === 'yes') {
         while (pendingTodosContainer.firstChild) {
@@ -110,8 +119,6 @@ export function readTodos(rerun) {
         addClassToElement(deleteButton, 'delete-button');
         deleteButton.src = './assets/delete_button.svg';
         appendElement(deleteButton, deleteButtonContainer);
-
-        const toggledItem = localStorage.getItem('toggled');
 
         if (toggledItem === 'true' && todoObject.done === true) {
             addClassToElement(inputContainer, 'hide');
