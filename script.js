@@ -1,14 +1,15 @@
 import { createTodo, readTodos } from "./localStorageAPI.js";
+import { addClassToElement, removeClassOfElement } from "./utils.js";
+
+window.onload = readTodos('no');
 
 const input = document.querySelector('.insert-todo-input');
-let inputValue = '';
-
 const toggle = document.querySelector('.done-todos-description'); // select all div in toggle
 const doneTodosContainer = document.querySelector('.done-todos-container');
 const toggleButton = document.querySelector('.toggle-todos');
 
+let inputValue = '';
 
-window.onload = readTodos('no');
 
 input.addEventListener('input', (e) => {
     inputValue = e.target.value;
@@ -23,24 +24,27 @@ input.addEventListener('keydown', (e) => {
 })
 
 toggle.addEventListener('click', () => {
-    if (localStorage.getItem('toggled') === null) {
+    const toggledLocalStorage = localStorage.getItem('toggled');
+    let style = toggleButton.style;
+
+    if (toggledLocalStorage === null) {
         localStorage.setItem('toggled', 'true');
-        toggleButton.style.transform = 'rotate(180deg)';
+        style.transform = 'rotate(180deg)';
     } else {
-        if (localStorage.getItem('toggled') === 'false') {
+        if (toggledLocalStorage === 'false') {
             localStorage.setItem('toggled', 'true');
-            toggleButton.style.transform = 'rotate(180deg)';
+            style.transform = 'rotate(180deg)';
         } else {
             localStorage.setItem('toggled', 'false');
-            toggleButton.style.transform = 'rotate(0deg)';
+            style.transform = 'rotate(0deg)';
         }
     }
 
     for (let item of doneTodosContainer.children) {
         if (item.classList.contains('hide')) {
-            item.classList.remove('hide');
+            removeClassOfElement(item, 'hide');
         } else {
-            item.classList.add('hide');
+            addClassToElement(item, 'hide');
         }
     }
 })

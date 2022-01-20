@@ -34,7 +34,7 @@ export function readTodos(rerun) {
 
     const pendingTodosContainer = document.querySelector('.pending-todos-container');
     const doneTodosContainer = document.querySelector('.done-todos-container');
-    
+
     if (rerun === 'yes') {
         while (pendingTodosContainer.firstChild) {
             pendingTodosContainer.firstChild.remove();
@@ -50,49 +50,48 @@ export function readTodos(rerun) {
     const arrayLocalStorage = Object.keys(localStorage).sort();
 
     arrayLocalStorage.map((key) => {
+        const todoObject = JSON.parse(localStorage.getItem(key)); // get todo in map loop
 
-        const todoObject = JSON.parse(localStorage.getItem(key));
-
-        const inputContainer = createElementUtils('div'); // contains input, delete button and checkbox
+        // create input container (input, delete button and checkbox)
+        const inputContainer = createElementUtils('div');
         addClassToElement(inputContainer, 'input-container');
 
-        const input = createElementUtils('input'); // create input
+         // create checkbox container and append
+         const checkboxContainer = createElementUtils('div');
+         addClassToElement(checkboxContainer, 'checkbox-container');
+         appendElement(checkboxContainer, inputContainer);
+ 
+         // create checkbox and append
+         const checkbox = createElementUtils('img');
+         addClassToElement(checkbox, 'checkbox');
+         appendElement(checkbox, checkboxContainer);
+
+        // create input  
+        const input = createElementUtils('input');
         addClassToElement(input, 'task-input');
         input.defaultValue = todoObject.todo;
         input.id = todoObject.id;
 
-
-        const checkboxContainer = createElementUtils('div');
-        addClassToElement(checkboxContainer, 'checkbox-container');
-        const checkbox = createElementUtils('img');
-        addClassToElement(checkbox, 'checkbox');
-        appendElement(checkbox, checkboxContainer);
-        appendElement(checkboxContainer, inputContainer);
-
-        if (todoObject.done === true) {
-            checkbox.src = './assets/check.svg';
-        }
-
-        const deleteButtonContainer = createElementUtils('div');
-
-        addClassToElement(deleteButtonContainer, 'delete-button-container');
-
-        const deleteButton = createElementUtils('img');
-        deleteButton.src = './assets/delete_button.svg';
-
-        addClassToElement(deleteButton, 'delete-button');
-        appendElement(deleteButton, deleteButtonContainer);
-
         if (todoObject.done === true) {
             appendElement(inputContainer, doneTodosContainer);
             addClassToElement(input, 'done');
+            checkbox.src = './assets/check.svg';
             appendElement(input, inputContainer);
         } else if (todoObject.done === false) {
             appendElement(inputContainer, pendingTodosContainer);
             appendElement(input, inputContainer);
         }
 
+        // create delete button container and append
+        const deleteButtonContainer = createElementUtils('div');
+        addClassToElement(deleteButtonContainer, 'delete-button-container');
         appendElement(deleteButtonContainer, inputContainer);
+
+        // create delete button and append
+        const deleteButton = createElementUtils('img');
+        addClassToElement(deleteButton, 'delete-button');
+        deleteButton.src = './assets/delete_button.svg';
+        appendElement(deleteButton, deleteButtonContainer);
 
         const toggledItem = localStorage.getItem('toggled');
 
@@ -103,7 +102,7 @@ export function readTodos(rerun) {
             removeClassOfElement(inputContainer, 'hide');
         }
 
-        // add event listener 
+        // delete todo
         deleteButtonContainer.addEventListener('click', () => {
             const idString = '' + todoObject.id;
             deleteTodo(idString);
@@ -118,7 +117,7 @@ export function readTodos(rerun) {
             }
         })
 
-        // update todo with new value
+        // rename todo
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 updateTodo(todoObject.id, input.value);
