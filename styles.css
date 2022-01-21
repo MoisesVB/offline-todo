@@ -35,12 +35,15 @@ h3 {
     display: flex;
     border-radius: 5px;
     transition: all 300ms;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
-.add-task-input-container img {
-    background-color: rgba(0, 0, 0, 0.05);
-    padding-left: 5px;
-    padding-right: 10px;
+.plus-icon-container {
+    display: flex;
+    margin-left: 7px;
+    margin-right: 10px;
+    cursor: pointer;
 }
 
 .insert-todo-input, .task-input {
@@ -53,6 +56,10 @@ h3 {
     background-color: rgba(0, 0, 0, 0.05);
     padding: 0px 10px 0px 10px;
     outline: none;
+}
+
+.insert-todo-input {
+    background-color: rgba(0, 0, 0, 0.001);
 }
 
 .task-input {

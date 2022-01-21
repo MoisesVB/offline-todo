@@ -1,5 +1,17 @@
 import { createElementUtils, addClassToElement, removeClassOfElement, appendElement } from "./utils.js";
 
+const pendingTodosContainer = document.querySelector('.pending-todos-container');
+const doneTodosContainer = document.querySelector('.done-todos-container');
+const addTodoInput = document.querySelector('.insert-todo-input');
+const toggledItem = localStorage.getItem('toggled');
+const toggleButton = document.querySelector('.toggle-todos');
+
+export function readTodos(rerun) {
+    firstRenderToggleButton();
+    rerenderTodos(rerun);
+    renderTodos();
+}
+
 export function createTodo(todo) {
 
     let greaterKey = 0;
@@ -30,21 +42,17 @@ export function createTodo(todo) {
     }
 }
 
-export function readTodos(rerun) {
-
-    const pendingTodosContainer = document.querySelector('.pending-todos-container');
-    const doneTodosContainer = document.querySelector('.done-todos-container');
-    const addTodoInput = document.querySelector('.insert-todo-input');
-    const toggleButton = document.querySelector('.toggle-todos');
-    const toggledItem = localStorage.getItem('toggled');
-
-    // move the toggle img based on status of 'toggled' on local storage (first render)
+// move the toggle img based on status of 'toggled' on local storage (first render)
+function firstRenderToggleButton() {
     if (toggledItem === 'true') {
         toggleButton.style.transform = 'rotate(180deg)';
     } else {
         toggleButton.style.transform = 'rotate(0deg)';
     }
+}
 
+// remove all todos to rerender
+function rerenderTodos(rerun) {
     if (rerun === 'yes') {
         while (pendingTodosContainer.firstChild) {
             pendingTodosContainer.firstChild.remove();
@@ -56,8 +64,31 @@ export function readTodos(rerun) {
 
         rerun === 'no';
     }
+}
 
-    const arrayLocalStorage = Object.keys(localStorage).sort();
+function setFocusParentElement(focusChildElement) {
+    focusChildElement.onfocus = () => {
+        focusChildElement.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
+    }
+}
+
+function setBlurParentElement(blurChildElement) {
+    blurChildElement.onblur = () => {
+        blurChildElement.parentElement.style.outline = 'none';
+    }
+}
+
+function hideOrUnhideTodo(todo, target) {
+    if (toggledItem === 'true' && todo.done === true) {
+        addClassToElement(target, 'hide');
+
+    } else if (toggledItem === 'false' && todo.done === true) {
+        removeClassOfElement(target, 'hide');
+    }
+}
+
+function renderTodos() {
+    const arrayLocalStorage = Object.keys(localStorage).sort(); // get a sorted array of local storage
 
     arrayLocalStorage.map((key) => {
         const todoObject = JSON.parse(localStorage.getItem(key)); // get todo in map loop
@@ -66,15 +97,15 @@ export function readTodos(rerun) {
         const inputContainer = createElementUtils('div');
         addClassToElement(inputContainer, 'input-container');
 
-         // create checkbox container and append
-         const checkboxContainer = createElementUtils('div');
-         addClassToElement(checkboxContainer, 'checkbox-container');
-         appendElement(checkboxContainer, inputContainer);
- 
-         // create checkbox and append
-         const checkbox = createElementUtils('img');
-         addClassToElement(checkbox, 'checkbox');
-         appendElement(checkbox, checkboxContainer);
+        // create checkbox container and append
+        const checkboxContainer = createElementUtils('div');
+        addClassToElement(checkboxContainer, 'checkbox-container');
+        appendElement(checkboxContainer, inputContainer);
+
+        // create checkbox and append
+        const checkbox = createElementUtils('img');
+        addClassToElement(checkbox, 'checkbox');
+        appendElement(checkbox, checkboxContainer);
 
         // create input  
         const input = createElementUtils('input');
@@ -83,21 +114,11 @@ export function readTodos(rerun) {
         input.defaultValue = todoObject.todo;
         input.id = todoObject.id;
 
-        input.onfocus = function() {
-            input.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
-        }
+        setFocusParentElement(input);
+        setBlurParentElement(input);
 
-        input.onblur = function() {
-            input.parentElement.style.outline = 'none';
-        }
-
-        addTodoInput.onfocus = function() {
-            addTodoInput.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
-        }
-
-        addTodoInput.onblur = function() {
-            addTodoInput.parentElement.style.outline = 'none';
-        }
+        setFocusParentElement(addTodoInput);
+        setBlurParentElement(addTodoInput);
 
         if (todoObject.done === true) {
             appendElement(inputContainer, doneTodosContainer);
@@ -120,13 +141,8 @@ export function readTodos(rerun) {
         deleteButton.src = './assets/delete_button.svg';
         appendElement(deleteButton, deleteButtonContainer);
 
-        if (toggledItem === 'true' && todoObject.done === true) {
-            addClassToElement(inputContainer, 'hide');
-
-        } else if (toggledItem === 'false' && todoObject.done === true) {
-            removeClassOfElement(inputContainer, 'hide');
-        }
-
+        hideOrUnhideTodo(todoObject, inputContainer);
+    
         // delete todo
         deleteButtonContainer.addEventListener('click', () => {
             const idString = '' + todoObject.id;
