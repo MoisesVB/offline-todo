@@ -46,6 +46,11 @@ h3 {
     cursor: pointer;
 }
 
+/* plus icon itself */
+.plus-icon-container img {
+    transition: all 200ms;
+}
+
 .insert-todo-input, .task-input {
     font-size: 14px;
     box-sizing: border-box;
@@ -117,10 +122,12 @@ h3 {
 .done-todos-description {
     display: flex;
     align-items: flex-start;
+    cursor: pointer;
 }
 
 .done-todos-description img {
     margin-right: 5px;
+    transition: all 200ms;
 }
 
 .hide {

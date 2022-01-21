@@ -5,6 +5,7 @@ const doneTodosContainer = document.querySelector('.done-todos-container');
 const addTodoInput = document.querySelector('.insert-todo-input');
 const toggledItem = localStorage.getItem('toggled');
 const toggleButton = document.querySelector('.toggle-todos');
+const plusIconContainer = document.querySelector('.plus-icon-container');
 
 export function readTodos(rerun) {
     firstRenderToggleButton();
@@ -117,8 +118,18 @@ function renderTodos() {
         setFocusParentElement(input);
         setBlurParentElement(input);
 
-        setFocusParentElement(addTodoInput);
-        setBlurParentElement(addTodoInput);
+        // setFocusParentElement(addTodoInput);
+        // setBlurParentElement(addTodoInput);
+
+        addTodoInput.onfocus = () => {
+            addTodoInput.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
+            plusIconContainer.classList.add('hide');
+        }
+
+        addTodoInput.onblur = () => {
+            addTodoInput.parentElement.style.outline = 'none';
+            plusIconContainer.classList.remove('hide');
+        }
 
         if (todoObject.done === true) {
             appendElement(inputContainer, doneTodosContainer);
