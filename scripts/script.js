@@ -190,7 +190,8 @@ function addToggleCheckboxEventListener(element, todoObject) {
     element.addEventListener('click', () => {
         if (todoObject.done === false) {
             toggleCheckbox(todoObject, true);
-            new Audio('../assets/effect.mp3').play();
+            const audio = new Audio('../assets/effect.mp3');
+            audio.play();
             
         } else if (todoObject.done === true) {
             toggleCheckbox(todoObject, false);
