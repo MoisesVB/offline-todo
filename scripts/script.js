@@ -230,9 +230,21 @@ function addToggleCheckboxEventListener(element, todoObject) {
 
 function addRenameEventListener(element, todoObject) {
     element.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && e.target.value.length > 0) {
             renameTodo(todoObject, element.value);
             e.target.blur();
+        }
+    })
+
+    // first add event listener to click
+    element.addEventListener('click', (e) => {
+
+        // check if input has value on blur, and if has then rename todo
+        element.onblur = () => {
+            if (e.target.value.length > 0) {
+                renameTodo(todoObject, element.value);
+                e.target.blur();
+            }
         }
     })
 }
