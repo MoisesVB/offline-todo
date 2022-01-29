@@ -1,8 +1,8 @@
 import { createElementUtils, appendElement, addClassToElement, removeClassOfElement } from "./utils.js";
-import { addTodoInput, pendingTodosContainer, doneTodosContainer, plusIconContainer } from "./DOMelements.js";
+import { addTodoInput, pendingTodosContainer, doneTodosContainer, plusIconContainer, toggleTodosSection, toggleIcon } from "./DOMelements.js";
 
 // load all tasks when first load the page
-window.onload = addAllTodosDOM();
+window.onload = firstLoad();
 
 let inputValue = '';
 
@@ -17,6 +17,28 @@ addTodoInput.addEventListener('keydown', (e) => {
         inputValue = '';
     }
 })
+
+function firstLoad() {
+    addAllTodosDOM();
+    firstCheckToggled();
+}
+
+function firstCheckToggled() {
+    const toggled = localStorage.getItem('toggled');
+
+    // if toggled is null them make false in website first access
+    if (toggled === null) {
+        localStorage.setItem('toggled', 'false');
+
+    // if toggled is true then rotate 180deg and hide all done todos
+    } else if (toggled === 'true') {
+        toggleIcon.style.transform = 'rotate(180deg)';
+        
+        for (let item of doneTodosContainer.children) {
+            item.classList.add('hide');
+        }
+    }
+}
 
 function createTodo(todo) {
 
@@ -134,6 +156,14 @@ function toggleCheckbox(targetObj, updatedState) {
             if (targetObj.done === true) {
                 appendElement(item.parentElement, doneTodosContainer);
                 addClassToElement(item, 'done');
+
+                // when new items are added to done make sure class are right
+
+                // if toggled is true then hide element that was checked as done
+                if (localStorage.getItem('toggled') === 'true') {
+                    addClassToElement(item.parentElement, 'hide');
+                } 
+
                 checkbox.src = './assets/check.svg';
 
             } else if (targetObj.done === false) {
@@ -221,3 +251,30 @@ function setFocusAndBlur(input, plusIconContainer) {
         plusIconContainer.classList.remove('hide');
     }
 }
+
+// toggle event listener
+toggleTodosSection.addEventListener('click', () => {
+    const toggled = localStorage.getItem('toggled');
+    const styleToggleIcon = toggleIcon.style;
+
+    // if toggle is true then make false after click and unhide done todos
+    if (toggled === 'true') {
+        localStorage.setItem('toggled', 'false');
+
+        for (let item of doneTodosContainer.children) {
+            removeClassOfElement(item, 'hide');
+        }
+
+        styleToggleIcon.transform = 'rotate(0deg)';
+
+    // if toggle is false then make true after click and hide done todos
+    } else if (toggled === 'false') {
+        localStorage.setItem('toggled', 'true');
+        
+        for (let item of doneTodosContainer.children) {
+            addClassToElement(item, 'hide');
+        }
+
+        styleToggleIcon.transform = 'rotate(180deg)';
+    }
+})
