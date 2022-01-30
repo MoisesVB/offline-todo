@@ -30,10 +30,10 @@ function firstCheckToggled() {
     if (toggled === null) {
         localStorage.setItem('toggled', 'false');
 
-    // if toggled is true then rotate 180deg and hide all done todos
+        // if toggled is true then rotate 180deg and hide all done todos
     } else if (toggled === 'true') {
         toggleIcon.style.transform = 'rotate(180deg)';
-        
+
         for (let item of doneTodosContainer.children) {
             item.classList.add('hide');
         }
@@ -93,7 +93,7 @@ function addTodoDOM(todoObject) {
     input.defaultValue = todoObject.todo;
     input.id = todoObject.id;
 
-    setFocusAndBlur(input, plusIconContainer);
+    setFocusAndBlur(input, plusIconContainer, todoObject);
 
     if (todoObject.done === true) {
         appendElement(inputContainer, doneTodosContainer);
@@ -162,7 +162,7 @@ function toggleCheckbox(targetObj, updatedState) {
                 // if toggled is true then hide element that was checked as done
                 if (localStorage.getItem('toggled') === 'true') {
                     addClassToElement(item.parentElement, 'hide');
-                } 
+                }
 
                 checkbox.src = './assets/check.svg';
 
@@ -188,18 +188,6 @@ function renameTodo(targetObj, newValue) {
         if (Number(item.id) === targetObj.id) {
             item.defaultValue = targetObj.todo;
         }
-    }
-}
-
-function setFocusParentElement(focusChildElement) {
-    focusChildElement.onfocus = () => {
-        focusChildElement.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
-    }
-}
-
-function setBlurParentElement(blurChildElement) {
-    blurChildElement.onblur = () => {
-        blurChildElement.parentElement.style.outline = 'none';
     }
 }
 
@@ -231,27 +219,25 @@ function addToggleCheckboxEventListener(element, todoObject) {
 function addRenameEventListener(element, todoObject) {
     element.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && e.target.value.length > 0) {
-            renameTodo(todoObject, element.value);
             e.target.blur();
-        }
-    })
-
-    // first add event listener to click
-    element.addEventListener('click', (e) => {
-
-        // check if input has value on blur, and if has then rename todo
-        element.onblur = () => {
-            if (e.target.value.length > 0) {
-                renameTodo(todoObject, element.value);
-                e.target.blur();
-            }
         }
     })
 }
 
-function setFocusAndBlur(input, plusIconContainer) {
-    setFocusParentElement(input);
-    setBlurParentElement(input);
+function setFocusAndBlur(input, plusIconContainer, todoObject) {
+    input.onfocus = () => {
+        input.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
+    }
+
+    input.onblur = () => {
+        input.parentElement.style.outline = 'none';
+
+        // rename todo if it's on blur, has value in input and value is different from previous value
+        // (both keyboard enter event and when input is not focused after click)
+        if (input.value.length > 0 && input.value !== todoObject.todo) {
+            renameTodo(todoObject, input.value);
+        }
+    }
 
     addTodoInput.onfocus = () => {
         addTodoInput.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
@@ -279,10 +265,10 @@ toggleTodosSection.addEventListener('click', () => {
 
         styleToggleIcon.transform = 'rotate(0deg)';
 
-    // if toggle is false then make true after click and hide done todos
+        // if toggle is false then make true after click and hide done todos
     } else if (toggled === 'false') {
         localStorage.setItem('toggled', 'true');
-        
+
         for (let item of doneTodosContainer.children) {
             addClassToElement(item, 'hide');
         }
