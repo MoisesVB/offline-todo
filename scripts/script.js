@@ -19,9 +19,16 @@ addTodoInput.addEventListener('input', (e) => {
 
 addTodoInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && inputValue.length > 0) {
-        createTodo(inputValue);
-        e.target.value = '';
-        inputValue = '';
+
+        // trim whitespaces at start and end of input value
+        inputValue = inputValue.trim();
+
+        // if new task has value
+        if (inputValue.length > 0) {
+            createTodo(inputValue);
+            e.target.value = '';
+            inputValue = '';
+        }
     }
 })
 
@@ -233,6 +240,7 @@ function addRenameEventListener(element) {
 
 function setFocusAndBlur(input, plusIconContainer, todoObject) {
 
+    // original input value
     const valueInput = input.value;
 
     input.onfocus = () => {
@@ -242,13 +250,17 @@ function setFocusAndBlur(input, plusIconContainer, todoObject) {
     input.onblur = () => {
         input.parentElement.style.outline = 'none';
 
+        // trim whitespaces at start and end of input value
+        input.value = input.value.trim();
+
         // rename todo if it's on blur, has value in input and value is different from previous value
         // (both keyboard enter event and when input is not focused after click)
         if (input.value.length > 0 && input.value !== todoObject.todo) {
             renameTodo(todoObject, input.value);
 
-        // if input is on blur and the value is zero, make the input value the same as the original
+            // if input is on blur and the value is zero, make the input value the same as the original
         } else if (input.value.length <= 0) {
+            console.log(valueInput)
             input.value = valueInput;
         }
     }
