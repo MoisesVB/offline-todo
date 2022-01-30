@@ -1,5 +1,12 @@
 import { createElementUtils, appendElement, addClassToElement, removeClassOfElement } from "./utils.js";
-import { addTodoInput, pendingTodosContainer, doneTodosContainer, plusIconContainer, toggleTodosSection, toggleIcon } from "./DOMelements.js";
+import {
+    addTodoInput,
+    pendingTodosContainer,
+    doneTodosContainer,
+    plusIconContainer,
+    toggleTodosSection,
+    toggleIcon
+} from "./DOMelements.js";
 
 // load all tasks when first load the page
 window.onload = firstLoad();
@@ -180,7 +187,6 @@ function renameTodo(targetObj, newValue) {
     const todoId = '' + targetObj.id;
     targetObj = JSON.stringify(targetObj);
     localStorage.setItem(todoId, targetObj);
-    // syncTodos();
 
     targetObj = JSON.parse(targetObj);
 
@@ -194,7 +200,7 @@ function renameTodo(targetObj, newValue) {
 function addAllEventListeners(deleteButtonContainer, checkboxContainer, input, todoObject) {
     addDeleteEventListener(deleteButtonContainer, todoObject);
     addToggleCheckboxEventListener(checkboxContainer, todoObject);
-    addRenameEventListener(input, todoObject);
+    addRenameEventListener(input);
 }
 
 function addDeleteEventListener(element, todoObject) {
@@ -216,7 +222,8 @@ function addToggleCheckboxEventListener(element, todoObject) {
     })
 }
 
-function addRenameEventListener(element, todoObject) {
+function addRenameEventListener(element) {
+    // this function blur input and then the function from input onblur in called
     element.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && e.target.value.length > 0) {
             e.target.blur();
@@ -225,6 +232,9 @@ function addRenameEventListener(element, todoObject) {
 }
 
 function setFocusAndBlur(input, plusIconContainer, todoObject) {
+
+    const valueInput = input.value;
+
     input.onfocus = () => {
         input.parentElement.style.outline = '1px solid rgba(0, 0, 0, 0.3)';
     }
@@ -236,6 +246,10 @@ function setFocusAndBlur(input, plusIconContainer, todoObject) {
         // (both keyboard enter event and when input is not focused after click)
         if (input.value.length > 0 && input.value !== todoObject.todo) {
             renameTodo(todoObject, input.value);
+
+        // if input is on blur and the value is zero, make the input value the same as the original
+        } else if (input.value.length <= 0) {
+            input.value = valueInput;
         }
     }
 
