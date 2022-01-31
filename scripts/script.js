@@ -89,6 +89,8 @@ function addTodoDOM(todoObject) {
     // create input container (input, delete button and checkbox)
     const inputContainer = createElementUtils('div');
     addClassToElement(inputContainer, 'input-container');
+    // set draggable attribute to Input Container
+    inputContainer.setAttribute("draggable", "true");
 
     // create checkbox container and append
     const checkboxContainer = createElementUtils('div');
@@ -131,6 +133,58 @@ function addTodoDOM(todoObject) {
     appendElement(deleteButton, deleteButtonContainer);
 
     addAllEventListeners(deleteButtonContainer, checkboxContainer, input, todoObject);
+
+    // task dragstart event listener
+    inputContainer.addEventListener('dragstart', () => {
+        inputContainer.classList.add('dragging');
+    })
+
+    // task dragend event listener
+    inputContainer.addEventListener('dragend', () => {
+        inputContainer.classList.remove('dragging');
+    })
+}
+
+// feature to pending containers accept draggable tasks
+pendingTodosContainer.addEventListener('dragover', e => {
+    // enable dropping
+    e.preventDefault();
+
+    // pass pendingTodosContainer and current y position of mouse and return to variable
+    const afterElement = getDragAfterElement(pendingTodosContainer, e.clientY);
+    // current draggable task
+    const draggable = document.querySelector('.dragging');
+    
+    if (afterElement == null) {
+        pendingTodosContainer.appendChild(draggable);
+    } else {
+        pendingTodosContainer.insertBefore(draggable, afterElement);
+    }
+
+})
+
+/**
+ * 
+ * @param {*} container it will be pendingTodosContainer
+ * @param {*} y current y position of mouse
+ */
+function getDragAfterElement(container, y) {
+    // get all tasks in pending container except current dragged task
+    const draggableElements = [...container.querySelectorAll('.input-container:not(.dragging)')]
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+
+        // distance between the center of the box and the mouse cursor (that will be on top)
+        const offset = y - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child }
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element
+
 }
 
 function addAllTodosDOM() {

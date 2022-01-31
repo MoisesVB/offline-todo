@@ -136,3 +136,9 @@ h3 {
 h3, img, .input-container, .insert-todo-input {
     user-select: none;
 }
+
+/*  */
+
+.dragging {
+    opacity: .5;
+}
